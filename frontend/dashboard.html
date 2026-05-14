@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChromaSense — Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<!-- Navigation -->
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+        <path d="M2 12h20"/>
+      </svg>
+    </div>
+    <span>ChromaSense</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn-ghost" onclick="startNewTest()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      New Test
+    </button>
+    <div class="user-menu">
+      <button class="user-btn" id="user-btn">
+        <span id="user-name">User</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+      <div class="dropdown" id="user-dropdown">
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Dashboard -->
+<div class="dashboard-container">
+  
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <h1 id="welcome-text">Welcome back!</h1>
+    <p id="welcome-sub">Here's your color vision journey</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent), var(--accent2));">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="total-tests">0</span>
+        <span class="stat-label">Tests Taken</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, var(--green), #2CB67D);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+          <polyline points="17 6 23 6 23 12"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="best-score">0%</span>
+        <span class="stat-label">Best Score</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, var(--cyan), var(--blue));">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <line x1="12" y1="20" x2="12" y2="10"/>
+          <line x1="18" y1="20" x2="18" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="16"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="avg-score">0%</span>
+        <span class="stat-label">Average Score</span>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, var(--yellow), var(--gold));">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="member-since">-</span>
+        <span class="stat-label">Member Since</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Improvement Banner -->
+  <div class="improvement-banner" id="improvement-banner" style="display: none;">
+    <div class="improvement-icon" id="improvement-icon">📈</div>
+    <div class="improvement-content">
+      <h3 id="improvement-title">Improvement Detected!</h3>
+      <p id="improvement-text">Your score improved by 15% compared to your last test.</p>
+    </div>
+    <div class="improvement-score" id="improvement-score">+15%</div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Recent Results -->
+    <div class="dashboard-card results-card">
+      <div class="card-header">
+        <h2>Recent Test Results</h2>
+        <a href="#" class="view-all" onclick="showAllResults()">View All</a>
+      </div>
+      <div class="results-list" id="results-list">
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <p>No tests taken yet</p>
+          <button class="btn-primary" onclick="startNewTest()">Take Your First Test</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vision Profile -->
+    <div class="dashboard-card profile-card">
+      <div class="card-header">
+        <h2>Current Vision Profile</h2>
+      </div>
+      <div class="profile-content" id="profile-content">
+        <div class="profile-type">
+          <span class="profile-label">Detected Type</span>
+          <span class="profile-value" id="cvd-type">Not tested yet</span>
+        </div>
+        <div class="profile-severity">
+          <span class="profile-label">Severity</span>
+          <span class="severity-badge" id="severity-badge">-</span>
+        </div>
+        <div class="profile-modules">
+          <div class="module-score">
+            <span>Ishihara</span>
+            <div class="module-bar"><div class="module-fill" id="bar-ishihara"></div></div>
+            <span id="score-ishihara">-</span>
+          </div>
+          <div class="module-score">
+            <span>Color ID</span>
+            <div class="module-bar"><div class="module-fill" id="bar-colorid"></div></div>
+            <span id="score-colorid">-</span>
+          </div>
+          <div class="module-score">
+            <span>Gradient</span>
+            <div class="module-bar"><div class="module-fill" id="bar-gradient"></div></div>
+            <span id="score-gradient">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Chart -->
+    <div class="dashboard-card chart-card">
+      <div class="card-header">
+        <h2>Progress Over Time</h2>
+        <div class="trend-badge" id="trend-badge">Stable</div>
+      </div>
+      <div class="chart-container">
+        <canvas id="progress-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-card actions-card">
+      <div class="card-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="actions-list">
+        <button class="action-btn" onclick="startNewTest()">
+          <span class="action-icon">🎯</span>
+          <div class="action-info">
+            <span class="action-title">Take New Test</span>
+            <span class="action-desc">Check your color vision</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <button class="action-btn" onclick="downloadReport()">
+          <span class="action-icon">📄</span>
+          <div class="action-info">
+            <span class="action-title">Download Report</span>
+            <span class="action-desc">Get PDF of your results</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <button class="action-btn" onclick="window.location.href='results.html'">
+          <span class="action-icon">👁️</span>
+          <div class="action-info">
+            <span class="action-title">Vision Simulation</span>
+            <span class="action-desc">See how colors appear</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+const API_BASE = 'http://localhost:3001';
+let userData = null;
+let resultsData = [];
+
+// Check authentication
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('chromasense_token');
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  loadDashboard();
+  setupUserMenu();
+});
+
+// Setup user menu dropdown
+function setupUserMenu() {
+  const userBtn = document.getElementById('user-btn');
+  const dropdown = document.getElementById('user-dropdown');
+  
+  userBtn.addEventListener('click', () => {
+    dropdown.classList.toggle('show');
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (!userBtn.contains(e.target)) {
+      dropdown.classList.remove('show');
+    }
+  });
+}
+
+// Load dashboard data
+async function loadDashboard() {
+  const token = localStorage.getItem('chromasense_token');
+  
+  try {
+    // Load user data and dashboard info
+    const res = await fetch(`${API_BASE}/api/dashboard`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      userData = data.user;
+      resultsData = data.recentResults;
+      
+      // Update UI
+      updateWelcome(data.user);
+      updateStats(data);
+      updateResultsList(data.recentResults);
+      updateProfile(data.recentResults[0]);
+      updateImprovement(data);
+      drawChart(data.recentResults);
+    }
+  } catch (err) {
+    showToast('Failed to load dashboard', 'error');
+  }
+}
+
+// Update welcome section
+function updateWelcome(user) {
+  document.getElementById('welcome-text').textContent = `Welcome back, ${user.firstName}!`;
+  document.getElementById('user-name').textContent = user.firstName;
+}
+
+// Update stats
+function updateStats(data) {
+  const results = data.recentResults;
+  
+  // Total tests
+  document.getElementById('total-tests').textContent = data.totalTests;
+  
+  // Best score
+  const bestScore = results.length > 0 ? Math.max(...results.map(r => r.overallScore)) : 0;
+  document.getElementById('best-score').textContent = bestScore + '%';
+  
+  // Average score
+  const avgScore = results.length > 0 
+    ? Math.round(results.reduce((sum, r) => sum + r.overallScore, 0) / results.length)
+    : 0;
+  document.getElementById('avg-score').textContent = avgScore + '%';
+  
+  // Member since
+  const memberDate = new Date(data.user.memberSince);
+  document.getElementById('member-since').textContent = memberDate.toLocaleDateString('en-US', { 
+    month: 'short', year: 'numeric' 
+  });
+}
+
+// Update results list
+function updateResultsList(results) {
+  const list = document.getElementById('results-list');
+  
+  if (results.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <p>No tests taken yet</p>
+        <button class="btn-primary" onclick="startNewTest()">Take Your First Test</button>
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = results.slice(0, 5).map((result, index) => {
+    const date = new Date(result.timestamp);
+    const isLatest = index === 0;
+    
+    return `
+      <div class="result-item ${isLatest ? 'latest' : ''}">
+        <div class="result-date">
+          <span class="date-day">${date.getDate()}</span>
+          <span class="date-month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
+        </div>
+        <div class="result-info">
+          <span class="result-type">${result.cvdType}</span>
+          <span class="result-severity ${result.severity.toLowerCase()}">${result.severity}</span>
+        </div>
+        <div class="result-score">
+          <span class="score-value">${result.overallScore}%</span>
+          <span class="score-label">Accuracy</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Update profile section
+function updateProfile(latestResult) {
+  if (!latestResult) return;
+  
+  document.getElementById('cvd-type').textContent = latestResult.cvdType;
+  
+  const severityBadge = document.getElementById('severity-badge');
+  severityBadge.textContent = latestResult.severity;
+  severityBadge.className = 'severity-badge ' + latestResult.severity.toLowerCase();
+  
+  // Update module scores
+  const modules = ['ishihara', 'colorid', 'gradient'];
+  modules.forEach(mod => {
+    const score = latestResult.moduleScores?.[mod] || 0;
+    document.getElementById(`score-${mod}`).textContent = score + '%';
+    document.getElementById(`bar-${mod}`).style.width = score + '%';
+  });
+}
+
+// Update improvement banner
+function updateImprovement(data) {
+  const banner = document.getElementById('improvement-banner');
+  
+  if (data.recentResults.length < 2) {
+    banner.style.display = 'none';
+    return;
+  }
+  
+  const latest = data.recentResults[0];
+  const previous = data.recentResults[1];
+  const diff = latest.overallScore - previous.overallScore;
+  
+  if (Math.abs(diff) < 2) {
+    banner.style.display = 'none';
+    return;
+  }
+  
+  banner.style.display = 'flex';
+  banner.className = 'improvement-banner ' + (diff > 0 ? 'positive' : 'negative');
+  
+  document.getElementById('improvement-icon').textContent = diff > 0 ? '📈' : '📉';
+  document.getElementById('improvement-title').textContent = diff > 0 ? 'Improvement Detected!' : 'Score Decreased';
+  document.getElementById('improvement-text').textContent = diff > 0 
+    ? `Your score improved by ${diff}% compared to your last test. Great job!`
+    : `Your score decreased by ${Math.abs(diff)}%. Consider taking another test.`;
+  document.getElementById('improvement-score').textContent = (diff > 0 ? '+' : '') + diff + '%';
+  
+  // Update trend badge
+  const trendBadge = document.getElementById('trend-badge');
+  trendBadge.textContent = data.trend.charAt(0).toUpperCase() + data.trend.slice(1);
+  trendBadge.className = 'trend-badge ' + data.trend;
+}
+
+// Draw progress chart
+function drawChart(results) {
+  const canvas = document.getElementById('progress-chart');
+  const ctx = canvas.getContext('2d');
+  
+  if (results.length < 2) {
+    ctx.font = '14px DM Sans';
+    ctx.fillStyle = '#666';
+    ctx.textAlign = 'center';
+    ctx.fillText('Take more tests to see your progress', canvas.width/2, canvas.height/2);
+    return;
+  }
+  
+  // Reverse for chronological order
+  const data = [...results].reverse().slice(-6);
+  
+  const padding = 40;
+  const chartWidth = canvas.width - padding * 2;
+  const chartHeight = canvas.height - padding * 2;
+  
+  const maxScore = 100;
+  const minScore = 0;
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padding + (chartHeight / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(canvas.width - padding, y);
+    ctx.stroke();
+  }
+  
+  // Draw line
+  ctx.strokeStyle = '#7C6FFF';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  data.forEach((result, i) => {
+    const x = padding + (chartWidth / (data.length - 1)) * i;
+    const y = padding + chartHeight - (result.overallScore / maxScore) * chartHeight;
+    
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  
+  ctx.stroke();
+  
+  // Draw points
+  data.forEach((result, i) => {
+    const x = padding + (chartWidth / (data.length - 1)) * i;
+    const y = padding + chartHeight - (result.overallScore / maxScore) * chartHeight;
+    
+    ctx.fillStyle = '#7C6FFF';
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+// Navigation functions
+function startNewTest() {
+  window.location.href = 'index.html';
+}
+
+function showAllResults() {
+  showToast('Full history view coming soon!', 'info');
+}
+
+function downloadReport() {
+  showToast('Report download coming soon!', 'info');
+}
+
+function logout() {
+  localStorage.removeItem('chromasense_token');
+  localStorage.removeItem('chromasense_user');
+  window.location.href = 'login.html';
+}
+
+// Toast notification
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+
+</body>
+</html>
